@@ -106,7 +106,8 @@ function Index() {
     setUserToken(token);
     setStep("confirmed");
     setBookToast(true);
-    setTimeout(() => setBookToast(false), 4000);
+    if (bookTimer.current) clearTimeout(bookTimer.current);
+    bookTimer.current = setTimeout(() => setBookToast(false), 4000);
   }
 
   function callNext() {
