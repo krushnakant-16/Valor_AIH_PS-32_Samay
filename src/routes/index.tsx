@@ -55,17 +55,28 @@ function Index() {
       .length;
   }, [queue, userEntry]);
 
+  const turnTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const nearTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const bookTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (turnTimer.current) clearTimeout(turnTimer.current);
+      if (nearTimer.current) clearTimeout(nearTimer.current);
+      if (bookTimer.current) clearTimeout(bookTimer.current);
+    },
+    [],
+  );
+
   const prevUserStatus = useRef<string | null>(null);
   useEffect(() => {
     if (!userEntry) return;
     if (prevUserStatus.current === "waiting" && userEntry.status === "serving") {
       setTurnToast(true);
-      const t = setTimeout(() => setTurnToast(false), 5000);
-      prevUserStatus.current = userEntry.status;
-      return () => clearTimeout(t);
+      if (turnTimer.current) clearTimeout(turnTimer.current);
+      turnTimer.current = setTimeout(() => setTurnToast(false), 5000);
     }
     prevUserStatus.current = userEntry.status;
-    return;
   }, [userEntry]);
 
   const nudged = useRef(false);
@@ -73,10 +84,9 @@ function Index() {
     if (userEntry && userEntry.status === "waiting" && ahead <= 3 && ahead > 0 && !nudged.current) {
       nudged.current = true;
       setNearToast(true);
-      const t = setTimeout(() => setNearToast(false), 4000);
-      return () => clearTimeout(t);
+      if (nearTimer.current) clearTimeout(nearTimer.current);
+      nearTimer.current = setTimeout(() => setNearToast(false), 4000);
     }
-    return;
   }, [ahead, userEntry]);
 
   function bookSlot() {
@@ -96,7 +106,8 @@ function Index() {
     setUserToken(token);
     setStep("confirmed");
     setBookToast(true);
-    setTimeout(() => setBookToast(false), 4000);
+    if (bookTimer.current) clearTimeout(bookTimer.current);
+    bookTimer.current = setTimeout(() => setBookToast(false), 4000);
   }
 
   function callNext() {
