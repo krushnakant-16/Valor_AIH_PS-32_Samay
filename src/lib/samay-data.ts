@@ -79,5 +79,5 @@ export const AVG_MIN = 6;
 export function assignCounter(queue: QueueEntry[], counters: string[]): string {
   const load = (c: string) =>
     queue.filter((q) => q.counter === c && (q.status === "waiting" || q.status === "serving")).length;
-  return [...counters].sort((a, b) => load(a) - load(b))[0] ?? counters[0];
+  return [...counters].sort((a, b) => load(a) - load(b))[0] ?? "Counter 1";
 }
