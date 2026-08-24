@@ -91,7 +91,7 @@ Download Samay_Demo.html → double-click → opens in your browser
 
 ## Roadmap
 
-- [ ] Real backend (API + PostgreSQL + Redis) per `Samay_God_Prompt.md`
+- [ ] Real backend (API + PostgreSQL + Redis)
 - [ ] Live Twilio SMS integration
 - [ ] Phone-OTP patient login
 - [ ] Facility admin dashboard (staff accounts, department hours, analytics)
