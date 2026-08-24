@@ -41,10 +41,10 @@ One queue. Two views. Always in sync.
 
 ## Try the demo
 
-The working prototype is a single self-contained HTML file — no install, no server, no internet connection required after download.
+The working prototype is a single self-contained lovableAI file — no install, no server, no internet connection required after download.
 
 ```
-
+https://hello-world-buddy-6123.lovable.app
 ```
 
 - Toggle between **Patient app** and **Staff dashboard** in the top bar
