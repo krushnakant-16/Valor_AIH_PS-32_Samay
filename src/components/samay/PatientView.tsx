@@ -1,3 +1,5 @@
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
   Bell,
@@ -11,6 +13,7 @@ import {
 } from "lucide-react";
 import { FlipToken } from "./FlipToken";
 import { DEPTS, SLOTS, type Department, type QueueEntry } from "@/lib/samay-data";
+import { estimateWaitTime } from "@/lib/wait-time.functions";
 
 export type PatientStep = "search" | "hospital" | "slots" | "confirmed";
 
@@ -35,6 +38,22 @@ export function PatientView({
   nowServing: string;
   userEntry: QueueEntry | undefined;
 }) {
+  const estimateFn = useServerFn(estimateWaitTime);
+  const { data: waitData, isPending: waitPending } = useQuery({
+    queryKey: ["wait", ahead, dept?.id ?? "none", dept?.counters.length ?? 1],
+    queryFn: () =>
+      estimateFn({
+        data: {
+          peopleAhead: ahead,
+          avgConsultMinutes: dept?.avgConsultMinutes ?? 6,
+          counters: dept?.counters.length ?? 1,
+        },
+      }),
+    enabled: step === "confirmed",
+  });
+  const waitMinutes =
+    waitData?.minutes ?? Math.round(ahead * (dept?.avgConsultMinutes ?? 6));
+
   return (
     <div className="mx-auto w-full max-w-md px-4 py-6">
       <div className="rounded-3xl border border-line bg-panel p-5 shadow-sm">
@@ -188,9 +207,12 @@ export function PatientView({
               <Clock className="mt-0.5 h-4 w-4 shrink-0 text-saffron" aria-hidden />
               <div>
                 <p className="font-display text-sm font-semibold text-paper">
-                  Estimated wait: ~{ahead * (dept?.avgConsultMinutes ?? 6)} min
+                  Estimated wait: ~{waitPending ? "…" : waitMinutes} min
                 </p>
                 <p className="mt-0.5 text-[11px] text-[#B9C0CE]">
+                  {waitData?.source === "wolfram" && !waitPending
+                    ? "Computed live via Wolfram. "
+                    : ""}
                   {userEntry && userEntry.status === "serving"
                     ? "It's your turn — head in now."
                     : "We'll text you as your turn approaches."}
