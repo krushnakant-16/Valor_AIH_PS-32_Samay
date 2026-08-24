@@ -44,7 +44,7 @@ One queue. Two views. Always in sync.
 The working prototype is a single self-contained HTML file — no install, no server, no internet connection required after download.
 
 ```
-Download Samay_Demo.html → double-click → opens in your browser
+
 ```
 
 - Toggle between **Patient app** and **Staff dashboard** in the top bar
