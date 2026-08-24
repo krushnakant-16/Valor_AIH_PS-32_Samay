@@ -1,3 +1,5 @@
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { Bell, CheckCircle2, Clock, PhoneCall, UserX, Users } from "lucide-react";
 import {
   CartesianGrid,
@@ -10,6 +12,7 @@ import {
 } from "recharts";
 import { FlipToken } from "./FlipToken";
 import { CHART_DATA, type Department, type QueueEntry } from "@/lib/samay-data";
+import { estimateWaitTime } from "@/lib/wait-time.functions";
 
 const STATUS_STYLE: Record<QueueEntry["status"], string> = {
   waiting: "bg-paper text-slate",
@@ -41,10 +44,24 @@ export function StaffView({
   noShowRate: string;
   avgWait: string;
 }) {
+  const estimateFn = useServerFn(estimateWaitTime);
+  const { data: avgData } = useQuery({
+    queryKey: ["wait-staff", waitingCount, dept.id, dept.counters.length],
+    queryFn: () =>
+      estimateFn({
+        data: {
+          peopleAhead: waitingCount,
+          avgConsultMinutes: dept.avgConsultMinutes,
+          counters: dept.counters.length,
+        },
+      }),
+  });
+  const avgWaitValue = avgData?.minutes != null ? `${avgData.minutes} min` : avgWait;
+
   const stats = [
     { label: "Waiting now", value: String(waitingCount), icon: Users },
     { label: "Served today", value: String(servedCount), icon: CheckCircle2 },
-    { label: "Avg wait", value: avgWait, icon: Clock },
+    { label: "Avg wait", value: avgWaitValue, icon: Clock },
     { label: "No-show rate", value: noShowRate, icon: Bell },
   ];
 
